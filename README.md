@@ -27,6 +27,7 @@ Please create a [New Issue](https://github.com/Codomari/journey/issues).
 ## Building from source
 It's build as every golang app: 
 ```go
+go mod download
 go build -o journey
 chmod +x journey
 ```
