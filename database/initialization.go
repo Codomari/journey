@@ -8,7 +8,7 @@ import (
 	"github.com/kabukky/journey/filenames"
 	"github.com/kabukky/journey/helpers"
 	"github.com/kabukky/journey/structure"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 	"github.com/satori/go.uuid"
 )
 
@@ -134,7 +134,7 @@ func Initialize() error {
 	}
 	// Open or create database file
 	var err error
-	readDB, err = sql.Open("sqlite3", filenames.DatabaseFilename)
+	readDB, err = sql.Open("sqlite", filenames.DatabaseFilename)
 	if err != nil {
 		return err
 	}

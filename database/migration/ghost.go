@@ -66,7 +66,7 @@ func convertGhostDatabase(fileName string) error {
 		return errors.New(filenames.DatabaseFilename + " already exists.")
 	}
 	log.Println("Trying to convert " + fileName + "...")
-	readDB, err := sql.Open("sqlite3", fileName)
+	readDB, err := sql.Open("sqlite", fileName)
 	if err != nil {
 		log.Println("Error:", err)
 		return err

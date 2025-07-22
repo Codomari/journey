@@ -81,7 +81,7 @@ jobs:
           RELEASE_DIR="journey-${{ steps.new_version.outputs.version }}"
           
           # Build for Linux Intel (AMD64)
-          GOOS=linux GOARCH=amd64 go build -o journey
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o journey
           chmod +x journey
           mkdir -p "release/${RELEASE_DIR}-linux-amd64"
           cp -r content "release/${RELEASE_DIR}-linux-amd64/"
@@ -96,7 +96,7 @@ jobs:
           cd ..
           
           # Build for Linux ARM64
-          GOOS=linux GOARCH=arm64 go build -o journey
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o journey
           chmod +x journey
           mkdir -p "release/${RELEASE_DIR}-linux-arm64"
           cp -r content "release/${RELEASE_DIR}-linux-arm64/"
@@ -115,7 +115,7 @@ jobs:
           RELEASE_DIR="journey-${{ steps.new_version.outputs.version }}"
           
           # Build for macOS Intel (AMD64)
-          GOOS=darwin GOARCH=amd64 go build -o journey
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o journey
           mkdir -p "release/${RELEASE_DIR}-darwin-amd64"
           cp -r content "release/${RELEASE_DIR}-darwin-amd64/"
           cp -r built-in "release/${RELEASE_DIR}-darwin-amd64/"
@@ -129,7 +129,7 @@ jobs:
           cd ..
           
           # Build for macOS Apple Silicon (ARM64)
-          GOOS=darwin GOARCH=arm64 go build -o journey
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o journey
           mkdir -p "release/${RELEASE_DIR}-darwin-arm64"
           cp -r content "release/${RELEASE_DIR}-darwin-arm64/"
           cp -r built-in "release/${RELEASE_DIR}-darwin-arm64/"
@@ -143,7 +143,7 @@ jobs:
           cd ..
           
           # Build for Windows AMD64
-          GOOS=windows GOARCH=amd64 go build -o journey.exe
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o journey.exe
           mkdir -p "release/${RELEASE_DIR}-windows-amd64"
           cp -r content "release/${RELEASE_DIR}-windows-amd64/"
           cp -r built-in "release/${RELEASE_DIR}-windows-amd64/"
