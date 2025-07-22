@@ -70,33 +70,7 @@ func ShowSitemap(w http.ResponseWriter) error {
 			})
 		}
 	}
-
-	tags, err := database.RetrieveAllTags()
-	if err != nil {
-		return err
-	}
-
-	for _, tag := range tags {
-		urlset.URLs = append(urlset.URLs, URL{
-			Loc:        baseURL + "/tag/" + tag.Slug + "/",
-			ChangeFreq: "weekly",
-			Priority:   "0.5",
-		})
-	}
-
-	users, err := database.RetrieveAllUsers()
-	if err != nil {
-		return err
-	}
-
-	for _, user := range users {
-		urlset.URLs = append(urlset.URLs, URL{
-			Loc:        baseURL + "/author/" + user.Slug + "/",
-			ChangeFreq: "weekly",
-			Priority:   "0.5",
-		})
-	}
-
+	
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>` + "\n"))
 
