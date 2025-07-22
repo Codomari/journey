@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
+	"mime"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -177,6 +179,75 @@ func sitemapHandler(w http.ResponseWriter, r *http.Request, params map[string]st
 	}
 }
 
+// staticHandler serves static files from the StaticFilepath directory.
+func staticHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	var err error
+
+	staticFile, cached := cachedStaticFiles[r.URL.Path]
+	if cached {
+		w.Header().Set("Content-Type", staticFile.MimeType)
+		w.Write(staticFile.Content)
+		return
+	}
+
+	filePath := filepath.Join(filenames.StaticFilepath, r.URL.Path)
+	_, err = os.Stat(filePath)
+	if err == nil {
+		http.ServeFile(w, r, filePath)
+		return
+	}
+
+	if os.IsNotExist(err) {
+		http.NotFound(w, r)
+		return
+	}
+
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+	return
+}
+
+type StaticFile struct {
+	Name     string
+	Path     string
+	Ext      string
+	Content  []byte
+	MimeType string
+}
+
+var staticFilesList = []string{
+	"favicon.ico",
+	"robots.txt",
+	"android-chrome-192x192.png",
+	"android-chrome-512x512.png",
+	"apple-touch-icon.png",
+	"favicon-16x16.png",
+	"favicon-32x32.png",
+}
+
+// cachedStaticFiles holds the contents of static files in memory for quick access.
+var cachedStaticFiles = map[string]StaticFile{}
+
+func init() {
+	for _, file := range staticFilesList {
+		filePath := filepath.Join(filenames.StaticFilepath, file)
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("Error reading static file %s: %v\n", file, err)
+			continue
+		}
+
+		ext := filepath.Ext(filePath)
+		mimeType := mime.TypeByExtension(ext)
+
+		cachedStaticFiles[file] = StaticFile{
+			Name:     file,
+			Path:     filePath,
+			Content:  data,
+			MimeType: mimeType,
+		}
+	}
+}
+
 func InitializeBlog(router *httptreemux.TreeMux) {
 	// For index
 	router.GET("/", indexHandler)
@@ -198,4 +269,9 @@ func InitializeBlog(router *httptreemux.TreeMux) {
 	router.GET("/public/*filepath", publicHandler)
 	// For sitemap
 	router.GET("/sitemap.xml", sitemapHandler)
+	// For static files
+	for _, file := range staticFilesList {
+		filePath := filepath.Join("/", file)
+		router.GET(filePath, staticHandler)
+	}
 }

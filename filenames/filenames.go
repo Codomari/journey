@@ -26,7 +26,8 @@ var (
 	ImagesFilepath   = filepath.Join(ContentFilepath, "images")
 	PluginsFilepath  = filepath.Join(ContentFilepath, "plugins")
 	PagesFilepath    = filepath.Join(ContentFilepath, "pages")
-
+	StaticFilepath   = filepath.Join(ContentFilepath, "static")
+	
 	// For https
 	HttpsFilepath     = filepath.Join(ContentFilepath, "https")
 	HttpsCertFilename = filepath.Join(ContentFilepath, "https", "cert.pem")
