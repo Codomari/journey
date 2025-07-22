@@ -1,0 +1,55 @@
+# github.com/dimfeld/httptreemux v5.0.1+incompatible
+## explicit
+github.com/dimfeld/httptreemux
+# github.com/fsnotify/fsnotify v1.9.0
+## explicit; go 1.17
+# github.com/gorilla/securecookie v1.1.2
+## explicit; go 1.20
+github.com/gorilla/securecookie
+# github.com/kabukky/feeds v0.0.0-20151110114325-c7025aca4568
+## explicit
+github.com/kabukky/feeds
+# github.com/kabukky/httpscerts v0.0.0-20150320125433-617593d7dcb3
+## explicit
+github.com/kabukky/httpscerts
+# github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
+## explicit
+github.com/kardianos/osext
+# github.com/mattn/go-sqlite3 v1.14.28
+## explicit; go 1.19
+github.com/mattn/go-sqlite3
+# github.com/russross/blackfriday v1.6.0
+## explicit; go 1.13
+github.com/russross/blackfriday
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid
+# github.com/yuin/gopher-lua v1.1.1
+## explicit; go 1.17
+github.com/yuin/gopher-lua
+github.com/yuin/gopher-lua/ast
+github.com/yuin/gopher-lua/parse
+github.com/yuin/gopher-lua/pm
+# golang.org/x/crypto v0.40.0
+## explicit; go 1.23.0
+golang.org/x/crypto/acme
+golang.org/x/crypto/acme/autocert
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
+# golang.org/x/net v0.41.0
+## explicit; go 1.23.0
+golang.org/x/net/idna
+# golang.org/x/sys v0.34.0
+## explicit; go 1.23.0
+golang.org/x/sys/unix
+# golang.org/x/text v0.27.0
+## explicit; go 1.23.0
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+## explicit; go 1.11
+# gopkg.in/fsnotify.v1 v1.4.7
+## explicit
+gopkg.in/fsnotify.v1

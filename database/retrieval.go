@@ -388,6 +388,42 @@ func RetrieveUsersCount() int {
 	return userCount
 }
 
+func RetrieveAllTags() ([]structure.Tag, error) {
+	tags := make([]structure.Tag, 0)
+	rows, err := readDB.Query("SELECT id, slug, name FROM tags")
+	if err != nil {
+		return tags, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var tag structure.Tag
+		err = rows.Scan(&tag.Id, &tag.Slug, &tag.Name)
+		if err != nil {
+			return tags, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, nil
+}
+
+func RetrieveAllUsers() ([]structure.User, error) {
+	users := make([]structure.User, 0)
+	rows, err := readDB.Query("SELECT id, name, slug, email, image, cover, bio, website, location FROM users")
+	if err != nil {
+		return users, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user structure.User
+		err = rows.Scan(&user.Id, &user.Name, &user.Slug, &user.Email, &user.Image, &user.Cover, &user.Bio, &user.Website, &user.Location)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
 func makeNavigation(navigation []byte) ([]structure.Navigation, error) {
 	navigationItems := make([]structure.Navigation, 0)
 	err := json.Unmarshal(navigation, &navigationItems)

@@ -168,6 +168,14 @@ func publicHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 	return
 }
 
+func sitemapHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	err := templates.ShowSitemap(w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func InitializeBlog(router *httptreemux.TreeMux) {
 	// For index
 	router.GET("/", indexHandler)
@@ -187,4 +195,6 @@ func InitializeBlog(router *httptreemux.TreeMux) {
 	router.GET("/images/*filepath", imagesHandler)
 	router.GET("/content/images/*filepath", imagesHandler) // This is here to keep compatibility with Ghost
 	router.GET("/public/*filepath", publicHandler)
+	// For sitemap
+	router.GET("/sitemap.xml", sitemapHandler)
 }
