@@ -10,11 +10,12 @@ import (
 
 var marchMayChecker = regexp.MustCompile("M([^a]|$)")
 
-// Whenever we need time.Now(), we use this function instead so that we always use UTC in journey
+// GetCurrentTime returns the current time in UTC timezone.
 func GetCurrentTime() time.Time {
 	return time.Now().UTC()
 }
 
+// GenerateTimeAgo returns a human-readable string representing the time elapsed since the given date.
 func GenerateTimeAgo(date *time.Time) []byte {
 	timeAgo := GetCurrentTime().Sub(*date)
 	if timeAgo.Minutes() < 1 {

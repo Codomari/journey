@@ -1,9 +1,10 @@
+//go:build !noplugins
 // +build !noplugins
 
 package structure
 
 import (
-	"github.com/yuin/gopher-lua"
+	lua "github.com/yuin/gopher-lua"
 )
 
 // RequestData: used for template/helper execution. Contains data specific to the incoming request.

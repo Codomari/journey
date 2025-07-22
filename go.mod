@@ -1,8 +1,6 @@
-module github.com/kabukky/journey
+module journey
 
-go 1.23.0
-
-toolchain go1.24.2
+go 1.24
 
 require (
 	github.com/dimfeld/httptreemux v5.0.1+incompatible

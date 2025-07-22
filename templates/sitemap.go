@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kabukky/journey/configuration"
-	"github.com/kabukky/journey/database"
-	"github.com/kabukky/journey/structure/methods"
+	"journey/configuration"
+	"journey/database"
+	"journey/structure/methods"
 )
 
 type URL struct {

@@ -3,9 +3,10 @@ package https
 import (
 	"log"
 
+	"journey/configuration"
+	"journey/filenames"
+
 	"github.com/kabukky/httpscerts"
-	"github.com/kabukky/journey/configuration"
-	"github.com/kabukky/journey/filenames"
 )
 
 func checkCertificates() {

@@ -1,11 +1,13 @@
+//go:build !noplugins
 // +build !noplugins
 
 package plugins
 
 import (
-	"github.com/kabukky/journey/structure"
-	"github.com/yuin/gopher-lua"
+	"journey/structure"
 	"log"
+
+	lua "github.com/yuin/gopher-lua"
 )
 
 func Execute(helper *structure.Helper, values *structure.RequestData) ([]byte, error) {

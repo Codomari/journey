@@ -11,18 +11,19 @@ import (
 	"strings"
 	"time"
 
+	"journey/authentication"
+	"journey/configuration"
+	"journey/conversion"
+	"journey/database"
+	"journey/date"
+	"journey/filenames"
+	"journey/slug"
+	"journey/structure"
+	"journey/structure/methods"
+	"journey/templates"
+
 	"github.com/dimfeld/httptreemux"
-	"github.com/kabukky/journey/authentication"
-	"github.com/kabukky/journey/configuration"
-	"github.com/kabukky/journey/conversion"
-	"github.com/kabukky/journey/database"
-	"github.com/kabukky/journey/date"
-	"github.com/kabukky/journey/filenames"
-	"github.com/kabukky/journey/slug"
-	"github.com/kabukky/journey/structure"
-	"github.com/kabukky/journey/structure/methods"
-	"github.com/kabukky/journey/templates"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type JsonPost struct {
@@ -74,7 +75,7 @@ type JsonImage struct {
 	Filename string
 }
 
-// Function to serve the login page
+// getLoginHandler serves the login page or redirects to registration if no users exist.
 func getLoginHandler(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	if database.RetrieveUsersCount() == 0 {
 		http.Redirect(w, r, "/admin/register/", 302)
@@ -84,7 +85,7 @@ func getLoginHandler(w http.ResponseWriter, r *http.Request, _ map[string]string
 	return
 }
 
-// Function to receive a login form
+// postLoginHandler processes login form submissions and authenticates users.
 func postLoginHandler(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	name := r.FormValue("name")
 	password := r.FormValue("password")
@@ -99,7 +100,7 @@ func postLoginHandler(w http.ResponseWriter, r *http.Request, _ map[string]strin
 	return
 }
 
-// Function to serve the registration form
+// getRegistrationHandler serves the registration form for new users.
 func getRegistrationHandler(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	if database.RetrieveUsersCount() == 0 {
 		http.ServeFile(w, r, filepath.Join(filenames.AdminFilepath, "registration.html"))
@@ -109,7 +110,7 @@ func getRegistrationHandler(w http.ResponseWriter, r *http.Request, _ map[string
 	return
 }
 
-// Function to recieve a registration form.
+// postRegistrationHandler processes registration form submissions and creates new users.
 func postRegistrationHandler(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	if database.RetrieveUsersCount() == 0 { // TODO: Or check if authenticated user is admin when adding users from inside the admin area
 		name := r.FormValue("name")
@@ -139,7 +140,7 @@ func postRegistrationHandler(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 }
 
-// Function to log out the user. Not used at the moment.
+// logoutHandler clears the user session and redirects to login.
 func logoutHandler(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	authentication.ClearSession(w)
 	http.Redirect(w, r, "/admin/login/", 302)

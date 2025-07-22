@@ -1,12 +1,13 @@
 package filenames
 
 import (
-	"github.com/kabukky/journey/flags"
-	"github.com/kardianos/osext"
+	"journey/flags"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/kardianos/osext"
 )
 
 var (

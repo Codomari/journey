@@ -1,15 +1,17 @@
+//go:build !noplugins
 // +build !noplugins
 
 package plugins
 
 import (
 	"errors"
-	"github.com/kabukky/journey/filenames"
-	"github.com/kabukky/journey/structure"
-	"github.com/yuin/gopher-lua"
+	"journey/filenames"
+	"journey/structure"
 	"log"
 	"os"
 	"path/filepath"
+
+	lua "github.com/yuin/gopher-lua"
 )
 
 func Load() error {
