@@ -33,9 +33,17 @@ func ShowPostTemplate(writer http.ResponseWriter, r *http.Request, slug string) 
 	post, err := database.RetrievePostBySlug(slug)
 	if err != nil {
 		return err
-	} else if !post.IsPublished { // Make sure the post is published before rendering it
+	}
+
+	if !post.IsPublished {
 		return errors.New("Post not published.")
 	}
+
+	if post.Slug != slug {
+		http.Redirect(writer, r, "/"+post.Slug+"/", 301)
+		return nil
+	}
+
 	requestData := structure.RequestData{Posts: make([]structure.Post, 1), Blog: methods.Blog, CurrentTemplate: 1, CurrentPath: r.URL.Path} // CurrentTemplate = post
 	requestData.Posts[0] = *post
 	// Check if there's a custom page template available for this slug
