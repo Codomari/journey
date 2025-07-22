@@ -76,28 +76,38 @@ jobs:
           git commit -m "Bump version to ${{ steps.new_version.outputs.version }}"
           git push
 
-      - name: Build and package release
+      - name: Build Linux releases
         run: |
-          # Build binary
-          go build -o journey
-          chmod +x journey
-          
-          # Create release directory with version
           RELEASE_DIR="journey-${{ steps.new_version.outputs.version }}"
-          mkdir -p "release/${RELEASE_DIR}"
           
-          # Copy all required files
-          cp -r content "release/${RELEASE_DIR}/"
-          cp -r built-in "release/${RELEASE_DIR}/"
-          cp LICENSE.md "release/${RELEASE_DIR}/"
-          cp README.md "release/${RELEASE_DIR}/"
-          cp VERSION "release/${RELEASE_DIR}/"
-          cp config.json "release/${RELEASE_DIR}/"
-          cp journey "release/${RELEASE_DIR}/"
-          
-          # Create zip
+          # Build for Linux Intel (AMD64)
+          GOOS=linux GOARCH=amd64 go build -o journey
+          chmod +x journey
+          mkdir -p "release/${RELEASE_DIR}-linux-amd64"
+          cp -r content "release/${RELEASE_DIR}-linux-amd64/"
+          cp -r built-in "release/${RELEASE_DIR}-linux-amd64/"
+          cp LICENSE.md "release/${RELEASE_DIR}-linux-amd64/"
+          cp README.md "release/${RELEASE_DIR}-linux-amd64/"
+          cp VERSION "release/${RELEASE_DIR}-linux-amd64/"
+          cp config.json "release/${RELEASE_DIR}-linux-amd64/"
+          cp journey "release/${RELEASE_DIR}-linux-amd64/"
           cd release
-          zip -r "${RELEASE_DIR}-linux-amd64.zip" "${RELEASE_DIR}"
+          zip -r "${RELEASE_DIR}-linux-amd64.zip" "${RELEASE_DIR}-linux-amd64"
+          cd ..
+          
+          # Build for Linux ARM64
+          GOOS=linux GOARCH=arm64 go build -o journey
+          chmod +x journey
+          mkdir -p "release/${RELEASE_DIR}-linux-arm64"
+          cp -r content "release/${RELEASE_DIR}-linux-arm64/"
+          cp -r built-in "release/${RELEASE_DIR}-linux-arm64/"
+          cp LICENSE.md "release/${RELEASE_DIR}-linux-arm64/"
+          cp README.md "release/${RELEASE_DIR}-linux-arm64/"
+          cp VERSION "release/${RELEASE_DIR}-linux-arm64/"
+          cp config.json "release/${RELEASE_DIR}-linux-arm64/"
+          cp journey "release/${RELEASE_DIR}-linux-arm64/"
+          cd release
+          zip -r "${RELEASE_DIR}-linux-arm64.zip" "${RELEASE_DIR}-linux-arm64"
           cd ..
 
       - name: Build for other platforms
@@ -163,7 +173,8 @@ jobs:
           ## Installation
           
           1. Download the appropriate archive for your platform:
-             - \`journey-${{ steps.new_version.outputs.version }}-linux-amd64.zip\` - Linux 64-bit
+             - \`journey-${{ steps.new_version.outputs.version }}-linux-amd64.zip\` - Linux Intel 64-bit
+             - \`journey-${{ steps.new_version.outputs.version }}-linux-arm64.zip\` - Linux ARM 64-bit
              - \`journey-${{ steps.new_version.outputs.version }}-darwin-amd64.zip\` - macOS Intel
              - \`journey-${{ steps.new_version.outputs.version }}-darwin-arm64.zip\` - macOS Apple Silicon
              - \`journey-${{ steps.new_version.outputs.version }}-windows-amd64.zip\` - Windows 64-bit
