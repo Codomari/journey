@@ -13,7 +13,7 @@
             <section itemprop="description" class="post_item_excerpt">
                 <p>
                     {{#if image}}
-                        <img src="{{image}}" alt="image" class="post_item_image" />
+                        <img src="{{image}}?maxWidth=320&maxHeight=320" alt="image" class="post_item_image" />
                     {{/if}}
                     {{excerpt words="35"}}&hellip;&nbsp;<a href="{{url}}" itemprop="url">»</a>
                 </p>
