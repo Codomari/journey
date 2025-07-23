@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"journey/authentication"
-	"journey/compression"
 	"journey/configuration"
 	"journey/conversion"
 	"journey/database"
@@ -379,44 +378,17 @@ func apiUploadHandler(w http.ResponseWriter, r *http.Request, _ map[string]strin
 			filename := strconv.FormatInt(currentDate.Unix(), 10)+"_"+uuid.NewV4().String()+filepath.Ext(part.FileName())
 			fullPath := filepath.Join(filePath, filename)
 			
-			// If it's an image file, try to compress it before saving
-			if compression.IsImageFile(part.FileName()) {
-				compressedData, wasCompressed, err := compression.CompressImageStream(part, part.FileName())
-				if err == nil && wasCompressed {
-					// Write compressed data to file
-					err = os.WriteFile(fullPath, compressedData, 0644)
-					if err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-				} else {
-					// Fallback to original file if compression failed or wasn't beneficial
-					dst, err := os.Create(fullPath)
-					if err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-					defer dst.Close()
-					
-					// Reset part reader if needed
-					if _, err := io.Copy(dst, part); err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-				}
-			} else {
-				// For non-image files, save normally
-				dst, err := os.Create(fullPath)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				defer dst.Close()
-				
-				if _, err := io.Copy(dst, part); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
+			// Save file without compression
+			dst, err := os.Create(fullPath)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer dst.Close()
+			
+			if _, err := io.Copy(dst, part); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 			// Rewrite to file path on server
 			filePath = strings.Replace(fullPath, filenames.ImagesFilepath, "/images", 1)
