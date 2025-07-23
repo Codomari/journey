@@ -6,7 +6,9 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
+	"journey/compression"
 	"journey/configuration"
 	"journey/database"
 	"journey/filenames"
@@ -68,6 +70,11 @@ func main() {
 		defer plugins.LuaPool.Shutdown()
 		log.Println("Plugins loaded.")
 	}
+
+	// Start image cache cleanup routine
+	// Clean up cache files older than 7 days, run cleanup every 24 hours
+	compression.StartCacheCleanup(filenames.ImagesCacheFilepath, 24*time.Hour, 7*24*time.Hour)
+	log.Println("Image compression cache cleanup routine started.")
 
 	// HTTP(S) Server
 	httpPort := configuration.Config.HttpHostAndPort

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"journey/authentication"
+	"journey/compression"
 	"journey/configuration"
 	"journey/conversion"
 	"journey/database"
@@ -375,18 +376,50 @@ func apiUploadHandler(w http.ResponseWriter, r *http.Request, _ map[string]strin
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			dst, err := os.Create(filepath.Join(filePath, strconv.FormatInt(currentDate.Unix(), 10)+"_"+uuid.NewV4().String()+filepath.Ext(part.FileName())))
-			defer dst.Close()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if _, err := io.Copy(dst, part); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+			filename := strconv.FormatInt(currentDate.Unix(), 10)+"_"+uuid.NewV4().String()+filepath.Ext(part.FileName())
+			fullPath := filepath.Join(filePath, filename)
+			
+			// If it's an image file, try to compress it before saving
+			if compression.IsImageFile(part.FileName()) {
+				compressedData, wasCompressed, err := compression.CompressImageStream(part, part.FileName())
+				if err == nil && wasCompressed {
+					// Write compressed data to file
+					err = os.WriteFile(fullPath, compressedData, 0644)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+				} else {
+					// Fallback to original file if compression failed or wasn't beneficial
+					dst, err := os.Create(fullPath)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					defer dst.Close()
+					
+					// Reset part reader if needed
+					if _, err := io.Copy(dst, part); err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+				}
+			} else {
+				// For non-image files, save normally
+				dst, err := os.Create(fullPath)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				defer dst.Close()
+				
+				if _, err := io.Copy(dst, part); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 			// Rewrite to file path on server
-			filePath = strings.Replace(dst.Name(), filenames.ImagesFilepath, "/images", 1)
+			filePath = strings.Replace(fullPath, filenames.ImagesFilepath, "/images", 1)
 			// Make sure to always use "/" as path separator (to make a valid url that we can use on the blog)
 			filePath = filepath.ToSlash(filePath)
 			allFilePaths = append(allFilePaths, filePath)

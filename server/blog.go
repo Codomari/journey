@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"journey/compression"
 	"journey/database"
 	"journey/filenames"
 	"journey/structure/methods"
@@ -169,6 +170,45 @@ func imagesHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 		return
 	}
 
+	// Try to serve compressed version with caching if it's an image file
+	if compression.IsImageFile(imagePath) {
+		compressedData, wasFromCache, err := compression.CompressImageWithCache(imagePath, filenames.ImagesCacheFilepath)
+		if err == nil {
+			// Generate ETag for compressed content
+			etag := fmt.Sprintf(`"%x-%x-compressed"`, fileInfo.ModTime().Unix(), len(compressedData))
+			w.Header().Set("ETag", etag)
+
+			// Check If-None-Match header for ETag validation
+			if match := r.Header.Get("If-None-Match"); match != "" {
+				if match == etag {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
+			}
+
+			// Set appropriate content type
+			contentType := mime.TypeByExtension(filepath.Ext(imagePath))
+			if contentType != "" {
+				w.Header().Set("Content-Type", contentType)
+			}
+
+			// Set cache headers
+			w.Header().Set("Cache-Control", "public, max-age=7776000")
+			
+			// Add compression info header for debugging
+			if wasFromCache {
+				w.Header().Set("X-Compression-Cache", "hit")
+			} else {
+				w.Header().Set("X-Compression-Cache", "miss")
+			}
+
+			// Serve compressed content
+			w.Write(compressedData)
+			return
+		}
+	}
+
+	// Fallback to original file serving if compression fails
 	// Generate ETag based on file modification time and size
 	// Format: "modtime-size" (similar to Apache's default ETag format)
 	etag := fmt.Sprintf(`"%x-%x"`, fileInfo.ModTime().Unix(), fileInfo.Size())
