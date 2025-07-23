@@ -154,7 +154,6 @@ func postEditHandler(w http.ResponseWriter, r *http.Request, params map[string]s
 }
 
 func assetsHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	// Read lock global blog
 	methods.Blog.RLock()
 	defer methods.Blog.RUnlock()
 	http.ServeFile(w, r, filepath.Join(filenames.ThemesFilepath, methods.Blog.ActiveTheme, "assets", params["filepath"]))
@@ -162,7 +161,30 @@ func assetsHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 }
 
 func imagesHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	http.ServeFile(w, r, filepath.Join(filenames.ImagesFilepath, params["filepath"]))
+	imagePath := filepath.Join(filenames.ImagesFilepath, params["filepath"])
+
+	fileInfo, err := os.Stat(imagePath)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Generate ETag based on file modification time and size
+	// Format: "modtime-size" (similar to Apache's default ETag format)
+	etag := fmt.Sprintf(`"%x-%x"`, fileInfo.ModTime().Unix(), fileInfo.Size())
+	w.Header().Set("ETag", etag)
+
+	w.Header().Set("Cache-Control", "public, max-age=7776000")
+
+	// Check If-None-Match header for ETag validation
+	if match := r.Header.Get("If-None-Match"); match != "" {
+		if match == etag {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+	}
+
+	http.ServeFile(w, r, imagePath)
 	return
 }
 
