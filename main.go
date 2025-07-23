@@ -71,10 +71,12 @@ func main() {
 		log.Println("Plugins loaded.")
 	}
 
-	// Start image cache cleanup routine
-	// Clean up cache files older than 7 days, run cleanup every 24 hours
-	compression.StartCacheCleanup(filenames.ImagesCacheFilepath, 24*time.Hour, 7*24*time.Hour)
-	log.Println("Image compression cache cleanup routine started.")
+	// Start image cache cleanup routine only if image compression is enabled
+	if configuration.Config.CompressImages {
+		// Clean up cache files older than 7 days, run cleanup every 24 hours
+		compression.StartCacheCleanup(filenames.ImagesCacheFilepath, 24*time.Hour, 7*24*time.Hour)
+		log.Println("Image compression cache cleanup routine started.")
+	}
 
 	// HTTP(S) Server
 	httpPort := configuration.Config.HttpHostAndPort
