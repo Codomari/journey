@@ -3,7 +3,7 @@ $colorWhite: #ffffff;
 $colorShadow: rgba(0, 0, 0, 0.3);
 $colorSidebarBackground: #303538;
 $colorText: #333333;
-$colorLink: #9eabb3;
+$colorLink: #6a7a85;
 $colorLinkHover: #57a3e8;
 $colorBorderPostList: #f2f2f2;
 $colorTooltip: #50585d;
@@ -37,12 +37,12 @@ $sidebarHeight: 30%;
 $fontSizePostItemTitle: 1.8em;
 
 // Shadows
-$titleSidebarShadow: 0 0.05em 0.1em $colorShadow;
+$titleSidebarShadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.7);
 $contentListShadow: 0 0 0.05em 0.05em $colorShadow;
 
 // Fonts
-$fontDefault: "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
-$fontHeader: "Open Sans", "Myriad Pro", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$fontDefault: Georgia, Cambria, "Times New Roman", Times, serif;
+$fontHeader: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
 
 //Mixins
 @mixin mixinHeader {
