@@ -85,40 +85,53 @@ func makeHelper(tag string, unescaped bool, startPos int, block []byte, children
 
 func findHelper(data []byte, allHelpers []structure.Helper) ([]byte, []structure.Helper) {
 	startPos := bytes.Index(data, openTag)
-	endPos := bytes.Index(data, closeTag)
-	if startPos != -1 && endPos != -1 {
-		openTagLength := len(openTag)
-		closeTagLength := len(closeTag)
-		unescaped := false
-		helperName := data[startPos+openTagLength : endPos]
-		// Check if helper calls for unescaped text (e.g. three brackets - {{{title}}})
-		if bytes.HasPrefix(helperName, []byte("{")) {
-			unescaped = true
-			openTagLength++ //not necessary
-			closeTagLength++
-			helperName = helperName[len([]byte("{")):]
-		}
-		helperName = bytes.Trim(helperName, " ") //make sure there are no trailing whitespaces
-		// Remove helper from data
-		parts := [][]byte{data[:startPos], data[endPos+closeTagLength:]}
-		data = bytes.Join(parts, []byte(""))
-		// Check if comment
-		if bytes.HasPrefix(helperName, []byte("! ")) || bytes.HasPrefix(helperName, []byte("!--")) {
-			return findHelper(data, allHelpers)
-		}
-		// Check if block
-		if bytes.HasPrefix(helperName, []byte("#")) {
-			helperName = helperName[len([]byte("#")):] //remove '#' from helperName
-			var helper structure.Helper
-			data, helper = findBlock(data, helperName, unescaped, startPos) //only use the data string after the opening tag
-			allHelpers = append(allHelpers, helper)
-			return findHelper(data, allHelpers)
-		}
-		allHelpers = append(allHelpers, *createHelper(helperName, unescaped, startPos, []byte{}, nil, nil))
-		return findHelper(data, allHelpers)
-	} else {
+	if startPos == -1 {
 		return data, allHelpers
 	}
+
+	unescaped := false
+	openTagLength := len(openTag)
+	closeTagLength := len(closeTag)
+	searchCloseTag := closeTag
+
+	// Check if we have triple brackets
+	if startPos+openTagLength < len(data) && data[startPos+openTagLength] == '{' {
+		unescaped = true
+		openTagLength++
+		searchCloseTag = []byte("}}}")
+		closeTagLength = 3
+	}
+
+	// Find the appropriate closing tag
+	endPos := bytes.Index(data[startPos+openTagLength:], searchCloseTag)
+	if endPos == -1 {
+		return data, allHelpers
+	}
+	endPos += startPos + openTagLength
+
+	helperName := data[startPos+openTagLength : endPos]
+	if unescaped && bytes.HasPrefix(helperName, []byte("{")) {
+		// Already handled the extra bracket in openTagLength above
+		helperName = helperName[len([]byte("{")):]
+	}
+	helperName = bytes.Trim(helperName, " ") //make sure there are no trailing whitespaces
+	// Remove helper from data
+	parts := [][]byte{data[:startPos], data[endPos+closeTagLength:]}
+	data = bytes.Join(parts, []byte(""))
+	// Check if comment
+	if bytes.HasPrefix(helperName, []byte("! ")) || bytes.HasPrefix(helperName, []byte("!--")) {
+		return findHelper(data, allHelpers)
+	}
+	// Check if block
+	if bytes.HasPrefix(helperName, []byte("#")) {
+		helperName = helperName[len([]byte("#")):] //remove '#' from helperName
+		var helper structure.Helper
+		data, helper = findBlock(data, helperName, unescaped, startPos) //only use the data string after the opening tag
+		allHelpers = append(allHelpers, helper)
+		return findHelper(data, allHelpers)
+	}
+	allHelpers = append(allHelpers, *createHelper(helperName, unescaped, startPos, []byte{}, nil, nil))
+	return findHelper(data, allHelpers)
 }
 
 func findBlock(data []byte, helperName []byte, unescaped bool, startPos int) ([]byte, structure.Helper) {
