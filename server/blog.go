@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"journey/compression"
 	"journey/database"
@@ -163,7 +164,18 @@ func postEditHandler(w http.ResponseWriter, r *http.Request, params map[string]s
 func assetsHandler(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	methods.Blog.RLock()
 	defer methods.Blog.RUnlock()
-	http.ServeFile(w, r, filepath.Join(filenames.ThemesFilepath, methods.Blog.ActiveTheme, "assets", params["filepath"]))
+	
+	filePath := filepath.Join(filenames.ThemesFilepath, methods.Blog.ActiveTheme, "assets", params["filepath"])
+	
+	// Add cache headers for CSS and JS files
+	ext := strings.ToLower(filepath.Ext(params["filepath"]))
+	if ext == ".css" || ext == ".js" {
+		// Set cache headers for 90 days (7776000 seconds)
+		w.Header().Set("Cache-Control", "public, max-age=7776000")
+		w.Header().Set("Expires", time.Now().Add(90*24*time.Hour).UTC().Format(http.TimeFormat))
+	}
+	
+	http.ServeFile(w, r, filePath)
 	return
 }
 
@@ -190,10 +202,10 @@ func imagesHandler(w http.ResponseWriter, r *http.Request, params map[string]str
 
 	// If resize parameters are provided and it's an image file, handle resizing
 	if (maxWidth > 0 || maxHeight > 0) && compression.IsImageFile(imagePath) {
-		// For post listings, default to 320px if no explicit size given
+		// For post listings, default to 100px if no explicit size given
 		if maxWidth == 0 && maxHeight == 0 {
-			maxWidth = 320
-			maxHeight = 320
+			maxWidth = 100
+			maxHeight = 100
 		}
 		
 		resizedData, wasFromCache, err := resizeImageWithCache(imagePath, maxWidth, maxHeight)

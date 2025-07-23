@@ -39,6 +39,19 @@
             .sidebar { position: relative; width: 100%; height: auto; }
             .sidebar_inner { padding: 30px; }
         }
+        
+        /* Progressive image loading styles */
+        .progressive-image {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .progressive-image.loading {
+            opacity: 0.7;
+        }
+        
+        .progressive-image.loaded {
+            opacity: 1;
+        }
     </style>
     
     {{! Load non-critical styles asynchronously }}
@@ -94,6 +107,42 @@
     </header>
     {{{body}}}
     {{ghost_foot}}
+    
+    <script type="text/javascript">
+        // Progressive image loading to prevent flickering
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit more to ensure initial render is complete
+            setTimeout(function() {
+                var progressiveImages = document.querySelectorAll('.progressive-image[data-full-src]');
+                
+                progressiveImages.forEach(function(img) {
+                    var fullSrc = img.getAttribute('data-full-src');
+                    if (!fullSrc) return;
+                    
+                    // Create a new image to preload the full-size version
+                    var fullImg = new Image();
+                    
+                    fullImg.onload = function() {
+                        // Add loading class for smooth transition
+                        img.classList.add('loading');
+                        
+                        // Replace with full-size image after a short delay
+                        setTimeout(function() {
+                            img.src = fullSrc;
+                            img.classList.remove('loading');
+                            img.classList.add('loaded');
+                            // Remove the data attribute to prevent re-processing
+                            img.removeAttribute('data-full-src');
+                        }, 50);
+                    };
+                    
+                    // Start loading the full-size image
+                    fullImg.src = fullSrc;
+                });
+            }, 200); // Small delay to ensure page is fully rendered
+        });
+    </script>
+    
     <script type="text/javascript">
         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
         var disqus_shortname = ''; // required: replace example with your forum shortname
