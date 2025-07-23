@@ -295,7 +295,23 @@ code {
   word-wrap: break-word; }
 
 .post_item_image {
-  max-width: 50%; }
+  float: left;
+  margin: 0 15px 10px 0;
+  max-width: 150px;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 4px
+}
+
+@media (max-width: 480px) {
+  .post_item_image {
+    max-width: 100px;
+    max-height: 75px;
+    margin: 0 10px 8px 0
+  }
+}
 
 .post_item_excerpt p {
   margin: 0;

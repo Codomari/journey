@@ -10,12 +10,14 @@
 					</a>
 				</h2>
 			</header>
-			<section itemprop="description" class="post_item_excerpt">
-				{{#if image}}
-					<img src="{{image}}" alt="image" class="post_item_image" />
-				{{/if}}
-				<p>{{excerpt words="35"}}&hellip;&nbsp;<a href="{{url}}" itemprop="url">»</a></p>
-			</section>
+            <section itemprop="description" class="post_item_excerpt">
+                <p>
+                    {{#if image}}
+                        <img src="{{image}}" alt="image" class="post_item_image" />
+                    {{/if}}
+                    {{excerpt words="35"}}&hellip;&nbsp;<a href="{{url}}" itemprop="url">»</a>
+                </p>
+            </section>
 			<footer class="post_item_footer">
 				<ul class="post_item_meta_list">
 					<li class="post_item_meta_item">
