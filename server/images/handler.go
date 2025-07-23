@@ -154,10 +154,10 @@ func handleImageResize(w http.ResponseWriter, r *http.Request, imagePath string,
 }
 
 func resizeImageWithCache(imagePath string, maxWidth, maxHeight int) ([]byte, bool, error) {
-	// Generate cache filename with the required extension format: $filename.$ext.320
+	// Generate cache filename with the required extension format: $filename.$ext.$maxWidthx$maxHeight
 	ext := filepath.Ext(imagePath)
 	baseName := strings.TrimSuffix(filepath.Base(imagePath), ext)
-	cacheFilename := fmt.Sprintf("%s%s.320", baseName, ext)
+	cacheFilename := fmt.Sprintf("%s%s.%dx%d", baseName, ext, maxWidth, maxHeight)
 	cachePath := filepath.Join(filenames.ImagesCacheFilepath, cacheFilename)
 
 	// Check if cached resized image exists and is newer than original
